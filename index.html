@@ -19,11 +19,6 @@
   text-decoration: underline;
 }
 
-.card:has(h3):not(:has(a.card-link)) {
-  background: #fafafa;
-  border-style: dashed;
-}
-
 /* Full-width card images */
 .card-image {
   width: calc(100%);   /* stretch past padding */
@@ -102,11 +97,13 @@ header p{margin-top:6px;color:#666;font-size:14px}
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 48px;
-  height: 4px;
-  border-radius: 2px;
-  background: #e63946; /* matches your bookmark heart */
+
+  width: 96px;        
+  height: 2px;        
+  border-radius: 1px;
+  background: #e63946;
 }
+
 
 
 .expand-tip {
@@ -160,11 +157,19 @@ header p{margin-top:6px;color:#666;font-size:14px}
 .card.loaded{opacity:1}
 .card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.06)}
 
-/* Remove hover lift + shadow on title-only cards */
-.card:has(h3):not(:has(a.card-link)):hover {
+
+/* Disable hover motion for subtitle / no-link cards (EXCEPT YouTube) */
+.card:not(:has(a.card-link)):not(:has(.yt-thumb)):hover {
   transform: none;
   box-shadow: none;
 }
+
+/* Remove hover lift on title-only cards (EXCEPT YouTube) */
+.card:has(h3):not(:has(a.card-link)):not(:has(.yt-thumb)):hover {
+  transform: none;
+  box-shadow: none;
+}
+
 
 /* Full-width preview images with bookmark-safe spacing */
 .card img.card-image {
@@ -190,6 +195,16 @@ header p{margin-top:6px;color:#666;font-size:14px}
   background: none !important;
   border-radius: 8px !important;
   display: block !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card .yt-thumb {
+  margin-top: 30px;
+}
+
+/* Make YouTube thumbnail wrapper behave as part of the card */
+.card > div:has(.yt-thumb) {
+  pointer-events: none;
 }
 
 .card h3{margin:4px 0 4px;font-size:18px;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
@@ -237,26 +252,26 @@ header p{margin-top:6px;color:#666;font-size:14px}
 }
 
 /* column title card */
-
 .column-title {
   font-size: 16px;
-  font-weight: 600;
-  min-height: 40px;
-  
-  display: flex;
-  align-items: center;       /* vertical centering */
-  justify-content: center;   /* horizontal centering (already desired) */
-  text-align: center;
-
-  padding: 8px 8px;
+  font-weight: 700;
+  min-height: 64px;                 /* ensures consistent height */
+  padding: 12px 14px;
   margin: 0;
 
-  background: none;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 20px 20px 0 0
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 
-  /* ✅ important: NOT sticky */
-  position: static;
+  /* Visual distinction */
+  background: none;
+  border-bottom: 2px solid #e63946; /* echoes your heart accent */
+  border-radius: 10px 10px 0 0;
+
+  /* Text safety */
+  line-height: 1.25;
 }
 
 /* Expanded column mode */
@@ -331,16 +346,47 @@ header p{margin-top:6px;color:#666;font-size:14px}
   color: rgba(0,0,0,0.45);
 }
 
-/* Hide bookmark on title-only cards (no image) */
-.card:not(:has(img.card-image)) .bookmark {
-  display: none;
-}
-
 /* Always show heart if card is bookmarked */
 .card .bookmark.active {
   display: block !important;
   opacity: 1;
 }
+
+/* Ensure bookmark is above YouTube thumbnail overlays */
+.card .bookmark {
+  z-index: 20 !important;
+}
+
+/* Hide bookmark only on text-only cards */
+.card.text-only .bookmark {
+  display: none;
+}
+
+/* ================================
+   TEXT-ONLY CARDS: SHOW ALL TEXT
+   ================================ */
+
+/* Allow full title text */
+.card.text-only h3 {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Allow full body text */
+.card.text-only p {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
 
 /* Backdrop for dimming */
 #backdrop {
@@ -711,7 +757,7 @@ const columnTitles = [
 
 let data = []; // global replacement for hard-coded data
 
-const SHEET_ID = "1MOo6kS3Q4D2yeSBlTMU76Eqm6YkfH_CFVz5BCu90m4I";
+const SHEET_ID = "12yxhykjpfqLPH6qxVHSnwdHpZYw4NVDuVRZRKWs7jRg";
 const SHEET_NAME = "cards";
 const SHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
 
@@ -880,6 +926,9 @@ function syncHeartState(cardId) {
 
 function fillCard(card, info, url) {
   card.dataset.cardId = info.id;
+  if (!info.image && !isYouTube(url)) {
+    card.classList.add("text-only");
+  }
   const bookmarked = isBookmarked(info.id);
   const title = info.title || "Untitled";
   const hasDescription = Boolean(info.description);
@@ -913,7 +962,7 @@ function fillCard(card, info, url) {
           display:flex;
           align-items:center;
           justify-content:center;
-          background:rgba(0,0,0,0.35);
+          background:transparent;
         ">
           <div style="
             width:60px;
@@ -948,7 +997,7 @@ function fillCard(card, info, url) {
 
       toggleBookmark(info.id);
 
-      const isActive = isBookmarked(url);
+      const isActive = isBookmarked(info.id);
       heart.classList.toggle("active", isActive);
       heart.innerHTML = heartSVG(isActive);
 
@@ -1025,7 +1074,7 @@ function fillCard(card, info, url) {
 
     toggleBookmark(info.id);
 
-    const isActive = isBookmarked(url);
+    const isActive = isBookmarked(info.id);
     heart.classList.toggle("active", isActive);
     heart.innerHTML = heartSVG(isActive);
 
