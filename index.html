@@ -7,8 +7,9 @@
 <style>
 
 .card-link {
-  display: inline-block;
+  display: block;
   margin-top: 8px;
+  margin-right: 36px; /* avoid heart zone */
   font-size: 14px;
   font-weight: 600;
   color: #1d4ed8;
@@ -170,6 +171,26 @@ header p{margin-top:6px;color:#666;font-size:14px}
   box-shadow: none;
 }
 
+.section-group {
+  margin-bottom: 18px;
+}
+
+.section-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin: 8px 0 6px;
+  padding: 6px 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.section-body {
+  display: flex;
+  flex-direction: column;
+}
+``
+
 
 /* Full-width preview images with bookmark-safe spacing */
 .card img.card-image {
@@ -274,27 +295,6 @@ header p{margin-top:6px;color:#666;font-size:14px}
   line-height: 1.25;
 }
 
-/* Expanded column mode */
-.column.expanded {
-  position: fixed;
-  overflow-y: auto;
-  z-index: 20;
-  grid-column: 1 / -1; /* span full width */
-  max-width: 900px;
-  margin: 0 auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.15);
-  transform: scale(1.02);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-/* Shrink other columns */
-.column.shrunk {
-  opacity: 0.25;
-  transform: scale(0.95);
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
 /* Close button */
 .close-expanded {
   position: sticky;
@@ -316,7 +316,7 @@ header p{margin-top:6px;color:#666;font-size:14px}
 
 .bookmark {
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   right: 8px;
   width: 26px;
   height: 26px;
@@ -404,51 +404,6 @@ header p{margin-top:6px;color:#666;font-size:14px}
   pointer-events: auto;
 }
 
-/* Expanded column becomes a fullscreen panel */
-.column.expanded {
-  position: fixed;
-  top: 60px;        /* leaves room for header */
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(900px, 95vw);
-  height: calc(90vh - 80px);
-  overflow-y: auto;
-  background: white;
-  z-index: 20;
-  padding-bottom: 40px;
-  animation: slideFadeIn 0.35s ease forwards;
-  box-shadow: 0 0 25px rgba(0,0,0,0.25);
-  border-radius: 10px;
-}
-
-.column.expanded::-webkit-scrollbar-track {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-/* Double-layer sticky header underlay */
-.column.expanded::before {
-  content: "";
-  position: absolute; /* not sticky */
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 48px;
-  background: #ffffff;
-  z-index: 10; /* sits behind wrapper */
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.column.expanded::after {
-  content: "";
-  position: sticky;
-  top: 48px; /* same as ::before height */
-  height: 12px;
-  background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0));
-  z-index: 15;
-  display: block;
-}
-
 /* Slide + fade animation */
 @keyframes slideFadeIn {
   from { transform: translate(-50%, -20px); opacity: 0; }
@@ -463,14 +418,6 @@ header p{margin-top:6px;color:#666;font-size:14px}
 
 .column.snap-back {
   animation: snapBack 0.2s ease;
-}
-
-/* Shrink background columns */
-.column.shrunk {
-  opacity: 0.15;
-  transform: scale(0.96);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  pointer-events: none;
 }
 
 /* Close button above expanded column */
@@ -648,6 +595,81 @@ header p{margin-top:6px;color:#666;font-size:14px}
 }
 
 
+/* ================================
+   OVERLAY COLUMN (CLONED)
+   ================================ */
+
+#overlay-column {
+  position: fixed;
+  top: 60px; /* below header */
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 95vw);
+  height: calc(90vh - 80px);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.28);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: overlayIn 0.35s ease forwards;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
+
+}
+
+#overlay-column .column-title {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  padding: 18px 0;
+  border-bottom: 1px solid #ddd;
+  z-index: 5;
+
+  column-span: all;
+  width: 100%;
+  margin-bottom: 20px;
+  
+  text-align: center;
+  font-size: 18px;
+  background: white;
+
+}
+
+#overlay-column .column-scroll {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+#overlay-column .column-scroll {
+  display: block;       /* normal flow */
+  padding: 20px;
+}
+
+#overlay-column .card {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Close button inside overlay */
+#overlay-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 34px;
+  text-align: center;
+}
+
+
 </style>
 </head>
 <body>
@@ -746,8 +768,6 @@ header p{margin-top:6px;color:#666;font-size:14px}
 
 <script>
 
-let activeExpandedColumn = null;
-
 const columnTitles = [
   "Five Tribes",
   "Indian Removal Act of 1830",
@@ -757,26 +777,47 @@ const columnTitles = [
 
 let data = []; // global replacement for hard-coded data
 
-const SHEET_ID = "12yxhykjpfqLPH6qxVHSnwdHpZYw4NVDuVRZRKWs7jRg";
+const SHEET_ID = "1iXVKl96RprMqaM_RoOlgfEO0UY8Z7K9aGaicm6iZzh4";
 const SHEET_NAME = "cards";
 const SHEET_URL = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+
+function generateId(row) {
+  const base = `${row.title || ""}-${row.link || ""}-${row.category || ""}`;
+  return base
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 async function loadSheetData() {
   try {
     const res = await fetch(SHEET_URL);
     const rows = await res.json();
 
-  data = rows.map(row => ({
-    id: row.id?.trim(),
-    title: row.title?.trim(),
-    description: row.description?.trim() || "",
-    url: row.link?.trim() || "",
-    linkTitle: row.link_title?.trim() || "",
-    category: row.category?.trim()?.toLowerCase() || "",
-    image: row.cover_image?.trim() || ""
-  }));
+    const seenIds = new Set();
+
+    data = rows.map(row => {
+      let id = generateId(row);
+
+      let counter = 1;
+      while (seenIds.has(id)) {
+        id = `${id}-${counter++}`;
+      }
+      seenIds.add(id);
+
+      return {
+        id,
+        title: row.title?.trim(),
+        description: row.description?.trim() || "",
+        url: row.link?.trim() || "",
+        linkTitle: row.link_title?.trim() || "",
+        category: row.category?.trim() || "",
+        section: row.section?.trim() || "General",
+        image: row.cover_image?.trim() || ""
+      };
+    });
 
     return data;
+
   } catch (err) {
     console.error("Failed to load Google Sheet data", err);
     return [];
@@ -1109,6 +1150,48 @@ function fillCard(card, info, url) {
   requestAnimationFrame(() => card.classList.add("loaded"));
 }
 
+function openOverlayColumn(originalColumn) {
+  if (document.getElementById("overlay-column")) return;
+
+  const backdrop = document.getElementById("backdrop");
+  backdrop.classList.add("active");
+
+  const overlay = document.createElement("div");
+  overlay.id = "overlay-column";
+  overlay.classList.add("column");
+
+  // Prevent clicks inside the overlay from closing it
+  overlay.addEventListener("click", e => e.stopPropagation());
+
+  const title = originalColumn.querySelector(".column-title").cloneNode(true);
+  const scroll = originalColumn.querySelector(".column-scroll").cloneNode(true);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.id = "overlay-close";
+  closeBtn.textContent = "×";
+  closeBtn.addEventListener("click", closeOverlayColumn);
+
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(title);
+  overlay.appendChild(scroll);
+
+  // ✅ IMPORTANT FIX
+  document.documentElement.appendChild(overlay);
+
+  // Close when clicking outside
+  backdrop.addEventListener("click", closeOverlayColumn, { once: true });
+}
+
+function closeOverlayColumn() {
+  const overlay = document.getElementById("overlay-column");
+  const backdrop = document.getElementById("backdrop");
+
+  if (overlay) overlay.remove();
+  backdrop.classList.remove("active");
+  backdrop.onclick = null;
+}
+
+
 async function init() {
   await loadSheetData();
 
@@ -1131,28 +1214,49 @@ async function init() {
     col.appendChild(scrollArea);
     columnsContainer.appendChild(col);
 
-    columns[title.toLowerCase()] = scrollArea;
+    columns[title] = scrollArea;
   });
 
   enableColumnExpansion();
 
-  // Render cards directly from sheet data
   data.forEach(site => {
     const column = columns[site.category];
     if (!column) return;
 
+    // ✅ Create section group if it doesn't exist
+    let sectionGroup = column.querySelector(
+      `[data-section="${site.section}"]`
+    );
+
+    if (!sectionGroup) {
+      sectionGroup = document.createElement("div");
+      sectionGroup.className = "section-group";
+      sectionGroup.dataset.section = site.section;
+
+      const sectionHeader = document.createElement("div");
+      sectionHeader.className = "section-header";
+      sectionHeader.textContent = site.section;
+
+      const sectionBody = document.createElement("div");
+      sectionBody.className = "section-body";
+
+      sectionGroup.appendChild(sectionHeader);
+      sectionGroup.appendChild(sectionBody);
+      column.appendChild(sectionGroup);
+    }
+
+    const sectionBody = sectionGroup.querySelector(".section-body");
+
     const card = document.createElement("div");
     card.className = "card";
-
     fillCard(card, site, site.url);
-    column.appendChild(card);
+
+    sectionBody.appendChild(card);
   });
 }
 
 function enableColumnExpansion() {
   const container = document.getElementById("columns");
-  const backdrop = document.getElementById("backdrop");
-  const closeBtn = document.getElementById("close-expanded-btn");
   const columns = Array.from(container.getElementsByClassName("column"));
 
   columns.forEach(col => {
@@ -1160,41 +1264,9 @@ function enableColumnExpansion() {
     title.style.cursor = "pointer";
 
     title.addEventListener("click", () => {
-      if (col.classList.contains("expanded")) return;
-
-      // Smooth scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" });
-
-      // Shrink others
-      columns.forEach(c => {
-        if (c !== col) c.classList.add("shrunk");
-      });
-
-      col.classList.add("expanded");
-      activeExpandedColumn = col;
-
-      backdrop.classList.add("active");
-      closeBtn.classList.add("active");
-
-      // Close handler
-      closeBtn.onclick = () => collapseColumn(col, columns, backdrop, closeBtn);
+      openOverlayColumn(col);
     });
   });
-}
-
-function collapseColumn(col, allColumns, backdrop, closeBtn) {
-  col.classList.add("snap-back");
-
-  setTimeout(() => {
-    col.classList.remove("expanded", "snap-back");
-
-    allColumns.forEach(c => c.classList.remove("shrunk"));
-
-    backdrop.classList.remove("active");
-    closeBtn.classList.remove("active");
-    
-    activeExpandedColumn = null;
-  }, 180);
 }
 
 function openYouTubeModal(videoID, title) {
@@ -1259,20 +1331,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   backdrop.addEventListener("click", () => {
     // ✅ If a column is expanded, close it
-    if (activeExpandedColumn) {
-      const columns = Array.from(
-        document.getElementById("columns").getElementsByClassName("column")
-      );
-
-      collapseColumn(
-        activeExpandedColumn,
-        columns,
-        backdrop,
-        document.getElementById("close-expanded-btn")
-      );
-
-      return;
-    }
 
     // ✅ Otherwise, close bookmarks panel if open
     if (panel.classList.contains("active")) {
